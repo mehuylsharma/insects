@@ -11,9 +11,9 @@ class Ant {
         this.accln = createVector(random(-0.5, 0.5), random(-0.5, 0.5));
 
         this.legs = [
-            new Leg(0, 0, 9, 15, 12, 2), new Leg(0, 0, -9, 15, -12, 2),
-            new Leg(0, 0, 6, 2, 7, 4), new Leg(0, 0, -6, 2, -7, 4),
-            new Leg(0, 0, 10, -16, 15, -8), new Leg(0, 0, -10, -16, -15, -8)
+            new Leg(0, 0, 9, 15, 13, 2), new Leg(0, 0, -9, 15, -13, 2, 200),
+            new Leg(0, 0, 6, 2, 8, 4, 50), new Leg(0, 0, -6, 2, -8, 4, 200),
+            new Leg(0, 0, 10, -16, 16, -4, 100), new Leg(0, 0, -10, -16, -16, -4, 300)
         ];
     }
 
@@ -75,14 +75,25 @@ class Ant {
 
         this.update();
 
-        this.legs.forEach(leg => {
-            leg.display(this.pos, theta);
-        })
-
         push();
 
         translate(this.pos);
         rotate(theta);
+
+        //Shadows
+
+        fill(5);
+        noStroke();
+
+        ellipse(5, 13, this.r, this.r);
+        ellipse(5, 5, this.r/2, this.r/2);
+        ellipse(5, -3, this.r*1.1, this.r*1.1);
+
+        this.legs.forEach(leg => {
+            leg.shadows(3, 5);
+        })
+        
+        //Body
 
         fill(255);
         noStroke();
@@ -92,5 +103,9 @@ class Ant {
         ellipse(0, -8, this.r*1.1, this.r*1.1);
 
         pop();
+
+        this.legs.forEach(leg => {
+            leg.display(this.pos, theta);
+        })
     }
 }
