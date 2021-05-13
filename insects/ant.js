@@ -9,6 +9,12 @@ class Ant {
 
         this.vel = createVector(0, 0);
         this.accln = createVector(random(-0.5, 0.5), random(-0.5, 0.5));
+
+        this.legs = [
+            new Leg(0, 0, 9, 15, 12, 2), new Leg(0, 0, -9, 15, -12, 2),
+            new Leg(0, 0, 6, 2, 7, 4), new Leg(0, 0, -6, 2, -7, 4),
+            new Leg(0, 0, 10, -16, 15, -8), new Leg(0, 0, -10, -16, -15, -8)
+        ];
     }
 
     checkForWalls() {
@@ -68,6 +74,10 @@ class Ant {
         var theta = this.vel.heading() - PI/2;
 
         this.update();
+
+        this.legs.forEach(leg => {
+            leg.display(this.pos, theta);
+        })
 
         push();
 
