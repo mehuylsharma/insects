@@ -1,7 +1,7 @@
 /// <reference path="./p5.global-mode.d.ts" />
 
 var antInfo = {
-    on: false,
+    on: true,
     total: 15,
     changeTimer: 45,
     population: [],
@@ -11,7 +11,11 @@ var antInfo = {
     gizmoBtn: null
 }
 
-var worms = [];
+var wormsInfo = {
+    on: true,
+    worms: [],
+    segments: 15
+}
 
 function setup() {
     createCanvas(1000, 650);
@@ -24,7 +28,9 @@ function setup() {
     antInfo.gizmoBtn = createButton('Ant Gizmos');
 
     //Setup worm
-    worm = new Worm(width/2, height/2, 10, 500);
+    for (let i = 0; i < wormsInfo.segments; i++) {
+        wormsInfo.worms[i] = new Worm(width/2, height/2+(i*10));
+    }
 }
 
 function draw() {
@@ -34,12 +40,31 @@ function draw() {
         ants();
     }
 
-    //Worm
+    if (wormsInfo.on) {
+        worms();
+    }
+}
+
+function worms() {
+    //Target
     var target = createVector(mouseX, mouseY);
-    worm.seek(target);
-    worm.update();
-    worm.display();
-    /* worm.segs.forEach(seg => seg.display()) */
+
+    for (let i = 0; i < wormsInfo.segments; i++) {
+        if (i !== 0) {
+            wormsInfo.worms[i].shadows(-5);
+        }
+    }
+
+    for (let i = 0; i < wormsInfo.segments; i++) {
+        if (i == 0) {
+            wormsInfo.worms[i].seek(target);
+        } else {
+            wormsInfo.worms[i].seek(wormsInfo.worms[i-1].pos);
+            wormsInfo.worms[i].repelOthers(wormsInfo.worms, i);
+            wormsInfo.worms[i].display();
+        }
+        wormsInfo.worms[i].update();
+    }
 }
 
 function ants() {
@@ -49,7 +74,7 @@ function ants() {
         antInfo.population[i].checkForWalls();
         antInfo.population[i].seek(antInfo.targets[i]);
         antInfo.population[i].display();
-        antInfo.population[i].repelOthers(antInfo.population, i);
+        antInfo.population[i].repelOthers(antInfo.population.concat(wormsInfo.worms), i);
     }
     
     if (antInfo.timer > antInfo.changeTimer) {

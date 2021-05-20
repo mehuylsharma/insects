@@ -1,20 +1,12 @@
 class Worm {
-    constructor(x, y, segs, len) {
+    constructor(x, y, mF = 0.2, mV = 1.5) {
         this.pos = createVector(x, y);
         this.vel = createVector(0, 0);
         this.accln = createVector(0, 0);
-        this.segments = segs;
-        this.length = len;
-        this.radius = (len/segs)*0.5;
+        this.radius = 30;
 
-        this.maxForce = 0.1;
-        this.maxVel = 2;
-
-        this.segs = [];
-
-        for (let i = 0; i < 9; i++) {
-            this.segs[i] = new Segment(this.radius, 20);
-        }
+        this.maxForce = mF;
+        this.maxVel = mV;
     }
 
     applyForce(vec) {
@@ -29,13 +21,6 @@ class Worm {
         steer.setMag(this.maxForce);
 
         this.applyForce(steer);
-
-        for (let i = 0; i < 9; i++) {
-            if (i == 0) {
-                this.segs[i].pointInDirection(target);
-            }
-            
-        }
     }
 
     update() {
@@ -45,14 +30,17 @@ class Worm {
         this.pos.add(this.vel);
 
         this.accln.mult(0);
+    }
 
-        for (let i = 0; i < 9; i++) {
-            if (i == 0) {
-                this.segs[i].chase(this.pos);
-            } else {
-                this.segs[i].chase(this.segs[i].initPos);
+    repelOthers(others, selfIndex) {
+        for (let i = 0; i < others.length; i++) {
+            if (i !== selfIndex) {
+                if (dist(others[i].pos.x, others[i].pos.y, this.pos.x, this.pos.y) < 12) {
+                    var repel = p5.Vector.sub(this.pos, others[i].pos);
+                    repel.limit(this.maxForce);
+                    this.applyForce(repel);
+                }
             }
-            
         }
     }
 
@@ -62,33 +50,20 @@ class Worm {
 
         translate(this.pos);
 
+        noStroke();
         ellipse(0, 0, this.radius, this.radius)
 
         pop();
     }
-}
 
-class Segment {
-    constructor(r, l) {
-        this.initPos = createVector(width/2, height/2);
-        this.finalPos = createVector(0, r);
-        this.length = l;
-        this.maxSpeed = 0.1;
-    }
+    shadows(d) {
+        push();
 
-    chase(vec) {
-        this.finalPos = vec;
-    }
+        translate(this.pos);
 
-    pointInDirection(target) {
-        this.initPos.x = this.finalPos.x - (target.x - this.finalPos.x)/10;
-        this.initPos.y = this.finalPos.y - (target.y - this.finalPos.y)/10;
-    }
+        fill(40);
+        ellipse(d, d, this.radius, this.radius);
 
-    display() {
-        fill(255);
-        stroke(255);
-        strokeWeight(3);
-        line(this.initPos.x, this.initPos.y, this.finalPos.x, this.finalPos.y);
+        pop();
     }
 }
