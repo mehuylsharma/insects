@@ -1,53 +1,74 @@
 /// <reference path="./p5.global-mode.d.ts" />
 
-const antsTotal = 15;
-const changeTimer = 30;
+var antInfo = {
+    on: false,
+    total: 15,
+    changeTimer: 45,
+    population: [],
+    targets: [],
+    timer: 0,
+    gizmos: false,
+    gizmoBtn: null
+}
 
-var ants = [];
-var targets = [];
-var timer = 0;
-var gizmos = false;
-var shadows = false;
-var gizmoButton = null;
+var worms = [];
 
 function setup() {
     createCanvas(1000, 650);
-    for (let i = 0; i < antsTotal; i++) {
-        ants[i] = new Ant(random(width), random(height));
-        targets[i] = createVector(random(width), random(height));
+
+    //Setup ants
+    for (let i = 0; i < antInfo.total; i++) {
+        antInfo.population[i] = new Ant(random(width), random(height));
+        antInfo.targets[i] = createVector(random(width), random(height));
     }
-    gizmoButton = createButton('Gizmos');
+    antInfo.gizmoBtn = createButton('Ant Gizmos');
+
+    //Setup worm
+    worm = new Worm(width/2, height/2, 10, 500);
 }
 
 function draw() {
-    background(50);
+    background(175);
 
+    if (antInfo.on) {
+        ants();
+    }
+
+    //Worm
+    var target = createVector(mouseX, mouseY);
+    worm.seek(target);
+    worm.update();
+    worm.display();
+    /* worm.segs.forEach(seg => seg.display()) */
+}
+
+function ants() {
     //Ant functions
 
-    for (let i = 0; i < antsTotal; i++) {
-        ants[i].checkForWalls();
-        ants[i].seek(targets[i]);
-        ants[i].display();
-        ants[i].repelOthers(ants, i);
+    for (let i = 0; i < antInfo.total; i++) {
+        antInfo.population[i].checkForWalls();
+        antInfo.population[i].seek(antInfo.targets[i]);
+        antInfo.population[i].display();
+        antInfo.population[i].repelOthers(antInfo.population, i);
     }
     
-    if (timer > changeTimer) {
-        for (let i = 0; i < antsTotal; i++) {
-            targets[i] = createVector(random(80, width-80), random(80, height - 80));
+    if (antInfo.timer > antInfo.changeTimer) {
+        for (let i = 0; i < antInfo.total; i++) {
+            antInfo.targets[i] = createVector(random(80, width-80), random(80, height - 80));
         }
-        timer = 0;
+        antInfo.timer = 0;
     }
 
-    gizmoButton.mouseClicked(() => {
-        gizmos = !gizmos;
+    antInfo.gizmoBtn.mouseClicked(() => {
+        antInfo.gizmos = !antInfo.gizmos;
     })
 
-    if (gizmos) {
-        //Draw Gizmos
+    if (antInfo.gizmos) {
+        //Draw antInfo.gizmos
 
-        for (let i = 0; i < antsTotal; i++) {
-            var t = targets[i];
-            var s = ants[i];
+        for (let i = 0; i < antInfo.total; i++) {
+            var t = antInfo.targets[i];
+            var s = antInfo.population[i];
 
             //Target
             fill(color(0, 200, 155));
@@ -64,5 +85,5 @@ function draw() {
         }
     }
 
-    timer++;
+    antInfo.timer++;
 }
