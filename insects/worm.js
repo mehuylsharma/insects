@@ -51,6 +51,7 @@ class Worm {
         translate(this.pos);
 
         noStroke();
+        fill(255);
         ellipse(0, 0, this.radius, this.radius)
 
         pop();
@@ -62,6 +63,7 @@ class Worm {
         translate(this.pos);
 
         fill(40);
+        noStroke();
         ellipse(d, d, this.radius, this.radius);
 
         pop();
